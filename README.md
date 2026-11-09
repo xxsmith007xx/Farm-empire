@@ -27,6 +27,7 @@ Progress autosaves to `localStorage`. Use *More → Copy save code* to move a sa
 | `js/art.js` | Sprite catalogue: every picture, its size and anchor, with placeholder art (see [ART_GUIDE.md](ART_GUIDE.md) to swap in real artwork) |
 | `js/scene.js` | Animated farm, rendered with [PixiJS](https://pixijs.com/): hopping chickens, hatching, buildings, trucks, drones, particles |
 | `js/audio.js` | Music and sound effects, synthesised live with the Web Audio API (no audio files). Each farm location has its own tune |
+| `js/native.js` | Phone-app extras (haptics, Android back button, durable saves); does nothing on the web |
 | `js/fx.js` | Interface effects: coins flying to counters, rolling numbers, button pops and sparkles |
 | `vendor/pixi-legacy.min.js` | PixiJS 7.4.2 (MIT licence), bundled so the game works offline and inside an app |
 | `js/ui.js` | Game loop, saving/offline progress, input, menus, sound |
@@ -34,9 +35,15 @@ Progress autosaves to `localStorage`. Use *More → Copy save code* to move a sa
 
 Balance lives at the top of `js/engine.js` (`EGGS`, `COOPS`, `TRUCKS`, `RESEARCH`, `PERKS` and the constants below them).
 
+## Phone app
+
+The game is also packaged as an Android and iOS app with Capacitor. See **[APP.md](APP.md)** for how to install a test build on your phone, build it yourself, and publish it.
+
 ## Development
 
 ```sh
-npm test     # runs the engine unit tests (Node 18+)
-npm start    # serves the game at http://localhost:8080
+npm test          # runs the engine unit tests (Node 22+)
+npm start         # serves the game at http://localhost:8080
+npm run sync      # builds www/ and copies it into the Android and iOS projects
+npm run android   # …then opens Android Studio (npm run ios opens Xcode)
 ```

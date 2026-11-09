@@ -7,16 +7,22 @@
   const $ = id => document.getElementById(id);
 
   // ---------- Load ----------
-  let s;
+  const N = window.FarmNative;
+  let s, hadLocalSave = false;
   try {
     const raw = localStorage.getItem(KEY) || localStorage.getItem(OLD_KEY);
+    hadLocalSave = !!raw;
     s = E.load(raw ? JSON.parse(raw) : null);
   } catch (e) { s = E.fresh(); }
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { /* storage full or blocked */ } };
+  const save = () => {
+    const json = JSON.stringify(s);
+    try { localStorage.setItem(KEY, json); } catch (e) { /* storage full or blocked */ }
+    N.saveCopy(json);
+  };
 
   // ---------- Sound (see js/audio.js) ----------
   const AU = window.FarmAudio;
-  const sfx = { buy: () => AU.play('buy'), no: () => AU.play('fail'), coin: () => AU.play('coin'), pop: () => AU.play('pop') };
+  const sfx = { buy: () => AU.play('buy'), no: () => { AU.play('fail'); N.haptic('light'); }, coin: () => AU.play('coin'), pop: () => AU.play('pop') };
   function applyAudioSettings() { AU.setMusic(s.settings.music); AU.setSfx(s.settings.sound); }
 
   // ---------- Toast & modal ----------
@@ -87,7 +93,7 @@
   }
   // Purchase feedback: the button and its icon pop, stars burst out.
   function bought(row) {
-    FX.pop(row.btn, .12); FX.pop(row.ico, .3); FX.sparkle(row.btn, 8);
+    FX.pop(row.btn, .12); FX.pop(row.ico, .3); FX.sparkle(row.btn, 8); N.haptic('medium');
     row.ico.animate && row.ico.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(-12deg)' }, { transform: 'rotate(10deg)' }, { transform: 'rotate(0)' }], { duration: 400 });
   }
 
@@ -245,6 +251,7 @@
     s.stats.taps++;
     S.hatched(1);
     FX.pop(document.querySelector('.hatchicon'), .25);
+    N.haptic('tap');
     if (x !== undefined) S.float(x, y, '+' + fmt(n) + ' 🐔', '#fff', 22);
     sfx.pop();
     refresh();
@@ -289,15 +296,15 @@
       const e = E.EGGS[s.tier], d = E.derived(s);
       modal('🥚 ' + e.name, e.desc + '<span class="big">' + fmt(d.value * d.mult) + ' coins/egg</span>Egg ' + (s.tier + 1) + ' of ' + E.EGGS.length + '.');
     };
-    $('rushBtn').onclick = () => { if (E.rush(s)) { AU.play('boost'); FX.pop($('rushBtn')); FX.sparkle($('rushBtn'), 10); S.shake(3); toast('🚚 Rush hour! ×' + E.RUSH.mult + ' income'); refresh(true); save(); } };
+    $('rushBtn').onclick = () => { if (E.rush(s)) { AU.play('boost'); N.haptic('medium'); FX.pop($('rushBtn')); FX.sparkle($('rushBtn'), 10); S.shake(3); toast('🚚 Rush hour! ×' + E.RUSH.mult + ' income'); refresh(true); save(); } };
     $('feastBtn').onclick = () => confirmModal('🌽 Golden feed', 'Spend ' + GEM + E.FEAST.gems + ' for ×' + E.FEAST.mult + ' income for ' + E.FEAST.duration / 60 + ' minutes?', 'Feed them!', () => {
-      if (E.feast(s)) { AU.play('boost'); FX.sparkle($('feastBtn'), 12); S.burst(400, 300, 40); toast('🌽 Golden feed! ×' + E.FEAST.mult + ' income'); refresh(true); save(); }
+      if (E.feast(s)) { AU.play('boost'); N.haptic('medium'); FX.sparkle($('feastBtn'), 12); S.burst(400, 300, 40); toast('🌽 Golden feed! ×' + E.FEAST.mult + ' income'); refresh(true); save(); }
     });
     $('discoverBtn').onclick = () => {
       if (!E.canDiscover(s)) return;
       const next = E.EGGS[s.tier + 1];
       confirmModal('Discover the ' + next.name + '?', next.desc + '<br><br>Your farm will start over with the new egg: coins, coops, trucks and research reset, but every egg is worth <b>' + fmt(next.value / E.EGGS[s.tier].value) + '× more</b>. Golden Seeds, gems and perks are kept.', 'Discover!', () => {
-        E.discover(s); AU.play('discover'); S.celebrate(); FX.shake(document.querySelector('.app'), 8); refresh(true); save();
+        E.discover(s); AU.play('discover'); N.haptic('success'); S.celebrate(); FX.shake(document.querySelector('.app'), 8); refresh(true); save();
         modal('🎉 New egg!', hero('egg_' + s.tier) + 'You now produce the <b>' + next.name + '</b>.<span class="big">' + fmt(next.value) + ' base value</span>Hatch chickens and rebuild. It goes faster every time!');
         checkAch();
       });
@@ -306,7 +313,7 @@
       const r = E.prestigeReward(s);
       if (r < 1) return;
       confirmModal('🌟 Expand your farm?', 'You will move to new land with a fresh Farm Egg farm. Coins, eggs, buildings and research are reset.<span class="big">+' + fmt(r) + ' Golden Seeds</span>Income bonus goes from ×' + fmt(E.derived(s).mult) + ' to ×' + fmt(1 + (s.seeds + r) * (0.1 + 0.01 * s.perks.seedPower)) + '.', 'Expand!', () => {
-        E.prestige(s); AU.play('prestige'); S.celebrate(); FX.shake(document.querySelector('.app'), 10); refresh(true); save();
+        E.prestige(s); AU.play('prestige'); N.haptic('success'); S.celebrate(); FX.shake(document.querySelector('.app'), 10); refresh(true); save();
         modal('🌟 New land!', hero('star') + 'Welcome to <b>' + S.PALETTES[s.expansions % S.PALETTES.length].name + '</b>.<span class="big">×' + fmt(E.derived(s).mult) + ' income</span>Your Golden Seeds make everything grow faster.');
         toast('🌍 Welcome to ' + S.PALETTES[s.expansions % S.PALETTES.length].name + '!');
         checkAch();
@@ -315,7 +322,7 @@
     $('gift').onclick = () => {
       const g = E.openGift(s);
       if (!g) return;
-      AU.play('gift'); S.burst(740, 40, 24);
+      AU.play('gift'); N.haptic('medium'); S.burst(740, 40, 24);
       const from = $('gift');
       FX.flyTo(from, g.gems ? $('gems').parentElement : $('coins').parentElement, g.gems ? g.gems * 2 : 10, g.gems ? 'gem' : 'coin');
       modal('🎁 Gift!', hero(g.gems ? 'gem' : 'coin') + (g.gems ? 'You found <span class="big">' + g.gems + ' gem' + (g.gems > 1 ? 's' : '') + '</span>' : 'A delivery bonus!<span class="big">' + fmt(g.coins) + ' coins</span>'));
@@ -351,13 +358,20 @@
     });
 
     document.addEventListener('visibilitychange', () => { if (document.hidden) { stopHold(); save(); } else loop(); });
+    N.onPause(() => { stopHold(); save(); });
+    // Android back button: close a pop-up, then go back to the Farm tab, then minimise the app.
+    N.onBack(() => {
+      if (!$('modal').classList.contains('hide')) { $('modal').classList.add('hide'); return true; }
+      if (tab !== 'farm') { document.querySelector('[data-tab=farm]').click(); return true; }
+      return false;
+    });
     window.addEventListener('pagehide', save);
   }
 
   // ---------- Achievements ----------
   function checkAch() {
     E.checkAchievements(s).forEach((a, i) => setTimeout(() => {
-      AU.play('achievement'); toast('🏆 ' + a.name + ' · +' + a.gems + ' gems');
+      AU.play('achievement'); N.haptic('success'); toast('🏆 ' + a.name + ' · +' + a.gems + ' gems');
       FX.flyTo([innerWidth / 2, 150], $('gems').parentElement, a.gems + 2, 'gem');
     }, i * 2600));
   }
@@ -392,7 +406,7 @@
   wire();
   S.init($('farm'), () => s, (x, y) => {
     const r = E.droneReward(s);
-    sfx.coin();
+    sfx.coin(); N.haptic('medium');
     S.float(x, y - 20, r.gems ? '+1 gem' : '+' + fmt(r.coins), r.gems ? '#9fd8ff' : '#ffe27a', 30);
     FX.flyTo(S.toClient(x, y), (r.gems ? $('gems') : $('coins')).parentElement, r.gems ? 3 : 10, r.gems ? 'gem' : 'coin');
     toast(r.gems ? '🚁 Drone caught: +1 gem!' : '🚁 Drone caught: +' + fmt(r.coins) + ' coins');
@@ -406,6 +420,15 @@
   loop();
   refreshMute();
   refresh(true);
+  // In the app, restore from the durable native copy if localStorage was cleared or is older.
+  N.loadCopy().then(json => {
+    if (!json) return;
+    try {
+      const copy = JSON.parse(json);
+      if (hadLocalSave && !(copy.last > s.last + 5000)) return;
+      s = E.load(copy); lastTier = ''; applyAudioSettings(); refreshMute(); refresh(true); loop();
+    } catch (e) { /* ignore a corrupt copy */ }
+  });
   setInterval(loop, 100);
   save();
 })();
