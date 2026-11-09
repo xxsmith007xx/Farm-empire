@@ -3,7 +3,7 @@
 Playable URL: https://xxsmith007xx.github.io/Farm-empire/preview-3d/
 Source: codex/compounding-momentum-v2-2 at ce6cc255377fa5eb2608f713043c59613a1527d8.
 
-Complete runtime: index.html, farm-model.js, economy.js, farm-3d.js, bundled Three.js 0.160.1 and its MIT license. Versioned script URLs prevent old browser module caches from selecting V2.1. version.json records deployed provenance and SHA-256 hashes.
+Complete runtime: index.html, farm-model.js, economy.js, farm-3d.js, bundled Three.js 0.160.1 and its MIT license. An inline SVG icon avoids browser icon requests for nonexistent root files. Versioned script URLs prevent old browser module caches from selecting V2.1. version.json records deployed provenance and SHA-256 hashes.
 
 ## Preview-specific save policy
 

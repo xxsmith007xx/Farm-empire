@@ -6,7 +6,7 @@
   "save_key": "sunny-acres-3d-preview-v1",
   "preview_policy": "Enable V2.2 for existing preview saves and imports; preserve progress and a one-time pre-V2.2 backup.",
   "files": {
-    "index.html": "05026907d532fb48b1bb34263e7922de026c3ba042d9342cdb62a203177c002d",
+    "index.html": "9389824ef0c780793fc43ff97d2d6bccd5635b810d11e21d6c60d24665c3f08e",
     "farm-model.js": "870ae3cc3edbbf917ac502b2a74a2395207809d69e8519c114d370d035ee0d6f",
     "economy.js": "bbb5b521943d2d89eb3cceb1b0205f074903eac6696ea8917680e16ca123b989",
     "farm-3d.js": "c87fada7ff854f17f83d61efe3a986943313b9f5a92e1120e96f2e8af28c86be",
