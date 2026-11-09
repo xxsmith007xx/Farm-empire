@@ -6,7 +6,7 @@
     const properties={...(save.properties||{})};
     properties[HOME]={id:HOME,name:'Sunny Acres',...(properties[HOME]||{})};
     // Only Sunny Acres is playable today. Preserve future records without granting income.
-    return {...save,schemaVersion:3,activePropertyId:HOME,properties};
+    return {...save,schemaVersion:4,activePropertyId:HOME,properties};
   }
   function milestones(s){
     const n=k=>Math.max(0,Number(s[k])||0);
