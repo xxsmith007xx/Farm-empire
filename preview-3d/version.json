@@ -1,0 +1,13 @@
+{
+  "version": "2.1",
+  "source_branch": "codex/living-farm-v2-1",
+  "source_commit": "d48129833c0a37e8d2a53b741a1b44df7779ef90",
+  "save_key": "sunny-acres-3d-preview-v1",
+  "files": {
+    "index.html": "6a659ca3fe88af7a31d1163003ef6082b0aff45961b94917cf094adfaa19f1b1",
+    "farm-model.js": "bdfaf38dbe2ab8bebd7223a04c34c08c50afc2a27a5c4b0d2f288a5529bfae0d",
+    "farm-3d.js": "c87fada7ff854f17f83d61efe3a986943313b9f5a92e1120e96f2e8af28c86be",
+    "vendor/three.module.min.js": "3e690ac7d180b0aadf0891bea39eec643e29e2d3e75c99b18689518665f69ba6",
+    "vendor/THREE-LICENSE.txt": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d"
+  }
+}
