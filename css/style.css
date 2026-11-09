@@ -143,3 +143,6 @@ button:active:not(:disabled){transform:scale(.97)}
 .boostbar{animation:boostglow 1.2s ease-in-out infinite alternate}
 @keyframes boostglow{to{filter:brightness(1.12);box-shadow:0 0 14px #ffd77399}}
 @media (prefers-reduced-motion:reduce){.buy::after,.tab .dot,.hero img,.hero .rays,.boostbar{animation:none!important}}
+
+.mute{position:absolute;top:10px;left:10px;width:38px;height:38px;border:0;border-radius:50%;background:#ffffffcc;font-size:18px;box-shadow:0 3px 10px #0002;z-index:2}
+.action.alt.off{opacity:.6}

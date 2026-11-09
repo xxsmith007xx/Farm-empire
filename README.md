@@ -26,6 +26,7 @@ Progress autosaves to `localStorage`. Use *More → Copy save code* to move a sa
 | `js/engine.js` | All game rules and balance data (pure logic, no DOM, so it's testable in Node) |
 | `js/art.js` | Sprite catalogue: every picture, its size and anchor, with placeholder art (see [ART_GUIDE.md](ART_GUIDE.md) to swap in real artwork) |
 | `js/scene.js` | Animated farm, rendered with [PixiJS](https://pixijs.com/): hopping chickens, hatching, buildings, trucks, drones, particles |
+| `js/audio.js` | Music and sound effects, synthesised live with the Web Audio API (no audio files). Each farm location has its own tune |
 | `js/fx.js` | Interface effects: coins flying to counters, rolling numbers, button pops and sparkles |
 | `vendor/pixi-legacy.min.js` | PixiJS 7.4.2 (MIT licence), bundled so the game works offline and inside an app |
 | `js/ui.js` | Game loop, saving/offline progress, input, menus, sound |

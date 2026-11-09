@@ -14,26 +14,10 @@
   } catch (e) { s = E.fresh(); }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { /* storage full or blocked */ } };
 
-  // ---------- Sound (tiny WebAudio blips, no assets) ----------
-  let audio;
-  function beep(freq, dur, type, vol) {
-    if (!s.settings.sound) return;
-    try {
-      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
-      const o = audio.createOscillator(), g = audio.createGain();
-      o.type = type || 'sine'; o.frequency.value = freq;
-      g.gain.setValueAtTime(vol || .06, audio.currentTime);
-      g.gain.exponentialRampToValueAtTime(.0001, audio.currentTime + dur);
-      o.connect(g).connect(audio.destination); o.start(); o.stop(audio.currentTime + dur);
-    } catch (e) { /* audio unavailable */ }
-  }
-  const sfx = {
-    hatch: () => beep(700 + Math.random() * 300, .08, 'triangle', .04),
-    buy: () => { beep(520, .08, 'square', .03); setTimeout(() => beep(780, .1, 'square', .03), 70); },
-    coin: () => { beep(988, .08, 'square', .03); setTimeout(() => beep(1319, .15, 'square', .03), 80); },
-    big: () => [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, .25, 'triangle', .05), i * 110)),
-    no: () => beep(180, .12, 'sawtooth', .03)
-  };
+  // ---------- Sound (see js/audio.js) ----------
+  const AU = window.FarmAudio;
+  const sfx = { buy: () => AU.play('buy'), no: () => AU.play('fail'), coin: () => AU.play('coin'), pop: () => AU.play('pop') };
+  function applyAudioSettings() { AU.setMusic(s.settings.music); AU.setSfx(s.settings.sound); }
 
   // ---------- Toast & modal ----------
   let toastTimer;
@@ -163,7 +147,9 @@
       ['Chickens hatched', fmt(st.hatched)], ['Drones caught', fmt(st.drones)], ['Gifts opened', fmt(st.gifts)],
       ['Best egg', E.EGGS[s.bestTier].name], ['Expansions', s.expansions], ['Farm age', days + ' day' + (days === 1 ? '' : 's')]
     ].map(([a, b]) => `<span>${a}</span><span>${b}</span>`).join('');
-    $('soundBtn').textContent = s.settings.sound ? '🔊 Sound on' : '🔈 Sound off';
+    $('soundBtn').textContent = s.settings.sound ? '🔊 Sounds on' : '🔈 Sounds off';
+    $('musicBtn').textContent = s.settings.music ? '🎵 Music on' : '🎵 Music off';
+    $('musicBtn').classList.toggle('off', !s.settings.music); $('soundBtn').classList.toggle('off', !s.settings.sound);
   }
 
   // ---------- Main refresh ----------
@@ -250,7 +236,7 @@
   }
 
   // ---------- Hatching ----------
-  let holdTimer = null, hatchedSinceSound = 0;
+  let holdTimer = null;
   function doHatch(units, x, y) {
     const d = E.derived(s);
     if (s.chickens >= d.cap) { toast('🏠 Coops are full! Build more in the Build tab.'); stopHold(); return; }
@@ -260,7 +246,7 @@
     S.hatched(1);
     FX.pop(document.querySelector('.hatchicon'), .25);
     if (x !== undefined) S.float(x, y, '+' + fmt(n) + ' 🐔', '#fff', 22);
-    if (++hatchedSinceSound % 2) sfx.hatch();
+    sfx.pop();
     refresh();
   }
   function startHold(e) {
@@ -291,6 +277,7 @@
     });
 
     document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+      AU.play('tap');
       tab = b.dataset.tab;
       document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === b));
       document.querySelectorAll('.tabpage').forEach(p => p.classList.toggle('hide', p.id !== tab + 'Tab'));
@@ -302,15 +289,15 @@
       const e = E.EGGS[s.tier], d = E.derived(s);
       modal('🥚 ' + e.name, e.desc + '<span class="big">' + fmt(d.value * d.mult) + ' coins/egg</span>Egg ' + (s.tier + 1) + ' of ' + E.EGGS.length + '.');
     };
-    $('rushBtn').onclick = () => { if (E.rush(s)) { sfx.coin(); FX.pop($('rushBtn')); FX.sparkle($('rushBtn'), 10); S.shake(3); toast('🚚 Rush hour! ×' + E.RUSH.mult + ' income'); refresh(true); save(); } };
+    $('rushBtn').onclick = () => { if (E.rush(s)) { AU.play('boost'); FX.pop($('rushBtn')); FX.sparkle($('rushBtn'), 10); S.shake(3); toast('🚚 Rush hour! ×' + E.RUSH.mult + ' income'); refresh(true); save(); } };
     $('feastBtn').onclick = () => confirmModal('🌽 Golden feed', 'Spend ' + GEM + E.FEAST.gems + ' for ×' + E.FEAST.mult + ' income for ' + E.FEAST.duration / 60 + ' minutes?', 'Feed them!', () => {
-      if (E.feast(s)) { sfx.big(); FX.sparkle($('feastBtn'), 12); S.burst(400, 300, 40); toast('🌽 Golden feed! ×' + E.FEAST.mult + ' income'); refresh(true); save(); }
+      if (E.feast(s)) { AU.play('boost'); FX.sparkle($('feastBtn'), 12); S.burst(400, 300, 40); toast('🌽 Golden feed! ×' + E.FEAST.mult + ' income'); refresh(true); save(); }
     });
     $('discoverBtn').onclick = () => {
       if (!E.canDiscover(s)) return;
       const next = E.EGGS[s.tier + 1];
       confirmModal('Discover the ' + next.name + '?', next.desc + '<br><br>Your farm will start over with the new egg: coins, coops, trucks and research reset, but every egg is worth <b>' + fmt(next.value / E.EGGS[s.tier].value) + '× more</b>. Golden Seeds, gems and perks are kept.', 'Discover!', () => {
-        E.discover(s); sfx.big(); S.celebrate(); FX.shake(document.querySelector('.app'), 8); refresh(true); save();
+        E.discover(s); AU.play('discover'); S.celebrate(); FX.shake(document.querySelector('.app'), 8); refresh(true); save();
         modal('🎉 New egg!', hero('egg_' + s.tier) + 'You now produce the <b>' + next.name + '</b>.<span class="big">' + fmt(next.value) + ' base value</span>Hatch chickens and rebuild. It goes faster every time!');
         checkAch();
       });
@@ -319,7 +306,7 @@
       const r = E.prestigeReward(s);
       if (r < 1) return;
       confirmModal('🌟 Expand your farm?', 'You will move to new land with a fresh Farm Egg farm. Coins, eggs, buildings and research are reset.<span class="big">+' + fmt(r) + ' Golden Seeds</span>Income bonus goes from ×' + fmt(E.derived(s).mult) + ' to ×' + fmt(1 + (s.seeds + r) * (0.1 + 0.01 * s.perks.seedPower)) + '.', 'Expand!', () => {
-        E.prestige(s); sfx.big(); S.celebrate(); FX.shake(document.querySelector('.app'), 10); refresh(true); save();
+        E.prestige(s); AU.play('prestige'); S.celebrate(); FX.shake(document.querySelector('.app'), 10); refresh(true); save();
         modal('🌟 New land!', hero('star') + 'Welcome to <b>' + S.PALETTES[s.expansions % S.PALETTES.length].name + '</b>.<span class="big">×' + fmt(E.derived(s).mult) + ' income</span>Your Golden Seeds make everything grow faster.');
         toast('🌍 Welcome to ' + S.PALETTES[s.expansions % S.PALETTES.length].name + '!');
         checkAch();
@@ -328,13 +315,20 @@
     $('gift').onclick = () => {
       const g = E.openGift(s);
       if (!g) return;
-      sfx.coin(); S.burst(740, 40, 24);
+      AU.play('gift'); S.burst(740, 40, 24);
       const from = $('gift');
       FX.flyTo(from, g.gems ? $('gems').parentElement : $('coins').parentElement, g.gems ? g.gems * 2 : 10, g.gems ? 'gem' : 'coin');
       modal('🎁 Gift!', hero(g.gems ? 'gem' : 'coin') + (g.gems ? 'You found <span class="big">' + g.gems + ' gem' + (g.gems > 1 ? 's' : '') + '</span>' : 'A delivery bonus!<span class="big">' + fmt(g.coins) + ' coins</span>'));
       refresh(true); save();
     };
-    $('soundBtn').onclick = () => { s.settings.sound = !s.settings.sound; refresh(true); save(); };
+    $('soundBtn').onclick = () => { s.settings.sound = !s.settings.sound; applyAudioSettings(); AU.play('tap'); refresh(true); save(); };
+    $('musicBtn').onclick = () => { s.settings.music = !s.settings.music; applyAudioSettings(); refresh(true); save(); };
+    $('muteBtn').onclick = e => {
+      e.stopPropagation();
+      const on = !(s.settings.sound || s.settings.music);
+      s.settings.sound = s.settings.music = on; applyAudioSettings(); refreshMute(); refresh(true); save();
+      toast(on ? '🔊 Sound on' : '🔇 Sound off');
+    };
     $('exportSave').onclick = async () => {
       save();
       const code = btoa(unescape(encodeURIComponent(JSON.stringify(s))));
@@ -348,12 +342,12 @@
         const v = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
         if (!v || typeof v !== 'object') throw Error('bad');
         confirmModal('Import save?', 'This replaces your current farm.', 'Import', () => {
-          s = E.load(v); s.last = Date.now(); lastTier = ''; save(); refresh(true); toast('📥 Save imported!');
+          s = E.load(v); s.last = Date.now(); lastTier = ''; applyAudioSettings(); refreshMute(); save(); refresh(true); toast('📥 Save imported!');
         });
       } catch (e) { toast('Invalid save code'); }
     };
     $('resetBtn').onclick = () => confirmModal('Reset everything?', 'This permanently erases all progress, including Golden Seeds, gems and perks.', 'Erase', () => {
-      s = E.fresh(); lastTier = ''; save(); refresh(true); toast('🌱 A brand new farm');
+      s = E.fresh(); lastTier = ''; applyAudioSettings(); refreshMute(); save(); refresh(true); toast('🌱 A brand new farm');
     });
 
     document.addEventListener('visibilitychange', () => { if (document.hidden) { stopHold(); save(); } else loop(); });
@@ -363,15 +357,16 @@
   // ---------- Achievements ----------
   function checkAch() {
     E.checkAchievements(s).forEach((a, i) => setTimeout(() => {
-      sfx.coin(); toast('🏆 ' + a.name + ' · +' + a.gems + ' gems');
+      AU.play('achievement'); toast('🏆 ' + a.name + ' · +' + a.gems + ' gems');
       FX.flyTo([innerWidth / 2, 150], $('gems').parentElement, a.gems + 2, 'gem');
     }, i * 2600));
   }
 
   // ---------- Game loop ----------
   function welcomeBack(r) {
+    AU.play('welcome');
     modal('🌙 Welcome back!', hero('coin') + 'You were away for ' + dur(r.seconds) + '. Your farm kept running' + (r.counted < r.seconds ? ' (up to ' + dur(r.counted) + ')' : '') + ' at ' + Math.round(E.offlineRate(s) * 100) + '% speed.<span class="big">' + fmt(r.coins) + ' coins</span>',
-      [{ label: 'Collect', fn: () => { sfx.coin(); FX.flyTo([innerWidth / 2, innerHeight / 2], $('coins').parentElement, 12, 'coin'); } }]);
+      [{ label: 'Collect', fn: () => { AU.play('coin'); FX.flyTo([innerWidth / 2, innerHeight / 2], $('coins').parentElement, 12, 'coin'); } }]);
   }
   let lastUi = 0, lastSave = Date.now(), lastAch = 0;
   function loop() {
@@ -389,7 +384,10 @@
     if (now - lastSave > 5000) { lastSave = now; save(); }
   }
 
+  function refreshMute() { $('muteBtn').textContent = s.settings.sound || s.settings.music ? '🔊' : '🔇'; }
+
   // ---------- Boot ----------
+  applyAudioSettings();
   buildLists();
   wire();
   S.init($('farm'), () => s, (x, y) => {
@@ -406,6 +404,7 @@
     try { localStorage.removeItem(OLD_KEY); } catch (e) { /* ignore */ }
   }
   loop();
+  refreshMute();
   refresh(true);
   setInterval(loop, 100);
   save();

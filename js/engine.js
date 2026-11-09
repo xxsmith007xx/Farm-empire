@@ -120,7 +120,7 @@
       boostLeft: 0, boostMult: 1, rushCooldown: 0, giftIn: GIFT_EVERY,
       stats: { hatched: 0, drones: 0, gifts: 0, taps: 0, maxChickens: 0, maxIncome: 0 },
       last: Date.now(), created: Date.now(),
-      settings: { sound: true }
+      settings: { sound: true, music: true }
     };
     PERKS.forEach(p => (s.perks[p.id] = 0));
     newRun(s);
@@ -150,7 +150,7 @@
     PERKS.forEach(p => (s.perks[p.id] = Math.min(p.max, Math.floor(num(raw.perks && raw.perks[p.id], 0)))));
     if (raw.achievements && typeof raw.achievements === 'object') for (const k in raw.achievements) if (raw.achievements[k]) s.achievements[k] = 1;
     if (raw.stats && typeof raw.stats === 'object') for (const k in s.stats) s.stats[k] = Math.max(0, num(raw.stats[k], 0));
-    if (raw.settings && typeof raw.settings === 'object') s.settings.sound = raw.settings.sound !== false;
+    if (raw.settings && typeof raw.settings === 'object') { s.settings.sound = raw.settings.sound !== false; s.settings.music = raw.settings.music !== false; }
     s.chickens = Math.min(s.chickens, capacity(s));
     s.tank = Math.min(s.tank, tankMax(s));
     if (s.boostMult < 1) s.boostMult = 1;

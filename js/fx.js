@@ -59,7 +59,7 @@
         frames.push({ transform: `translate(${x}px,${y}px) translate(-50%,-50%) scale(${1.1 - k * .5})`, offset: .3 + k * .7 });
       }
       const an = c.animate(frames, { duration: 850, delay: i * 45, easing: 'ease-in', fill: 'both' });
-      an.onfinish = () => { c.remove(); pop(target, .1); if (onEach) onEach(i); };
+      an.onfinish = () => { c.remove(); pop(target, .1); if (window.FarmAudio) FarmAudio.play('tick', { i }); if (onEach) onEach(i); };
     }
   }
   // A number display that smoothly rolls toward its target value.

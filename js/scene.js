@@ -6,6 +6,7 @@
   const A = window.FarmArt, E = window.FarmEngine;
   const REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   const rand = (a, b) => a + Math.random() * (b - a);
+  const sound = (name, o) => window.FarmAudio && window.FarmAudio.play(name, o);
   const hex = c => parseInt(c.replace('#', '').slice(0, 6), 16);
 
   let app, getState, onDroneHit, ready = false, t = 0;
@@ -203,7 +204,7 @@
     } else {
       sy = 1 + Math.sin(t * 3 + c.seed) * .03;
       if (c.timer <= 0) {
-        if (Math.random() < .35) { c.state = 'peck'; c.timer = .7; }
+        if (Math.random() < .35) { c.state = 'peck'; c.timer = .7; if (Math.random() < .12) sound('cluck'); }
         else {
           let [x, y] = fieldPoint();
           const d = Math.hypot(x - c.x, y - c.y);
@@ -233,7 +234,7 @@
 
   // ---------- hatching: egg at the barn door cracks, chick runs out ----------
   const DOOR = [391, 336];
-  function hatchAnim(becomesChicken) {
+  function hatchAnim(becomesChicken, quiet) {
     if (hatches.length >= 6) { squash(barn, .05); return false; }
     const st = getState(), h = { chicken: becomesChicken };
     hatches.push(h);
@@ -243,6 +244,7 @@
     to(egg, { sx: .7, sy: .7 }, .2, 'outBack');
     anim(.35, k => { egg.rotation = Math.sin(k * Math.PI * 6) * .3 * (1 - k * .5); }, { delay: .2, owner: egg, ease: 'linear', done: () => {
       const tint = hex(E.EGGS[st.tier].color);
+      sound('hatch', { quiet });
       for (const [key, vx, vy, spin] of [['shell_top', -70, -200, -8], ['shell_bottom', 60, -60, 5]])
         particle(key, DOOR[0], DOOR[1] - 4, { vx: vx + rand(-20, 20), vy, g: 600, life: .7, spin, tint, layer: world, zIndex: 340, size: .9 });
       particle('puff', DOOR[0], DOOR[1], { life: .4, size: .5, grow: 1, layer: world, zIndex: 341 });
@@ -275,7 +277,7 @@
     if (chickens.length > want && coming === 0) { while (chickens.length > want) removeChicken(); }
     else if (chickens.length + coming < want && spawnCooldown <= 0) {
       spawnCooldown = .25;
-      if (!hatchAnim(true)) addChicken(...fieldPoint(), true);
+      if (!hatchAnim(true, true)) addChicken(...fieldPoint(), true);
     }
   }
 
@@ -290,7 +292,7 @@
         if (upgrade && c.initialised) {
           c.sp.sx = 1.35; c.sp.sy = .35; applyScale(c.sp);
           to(c.sp, { sx: 1, sy: 1 }, .9, 'outElastic');
-          dust(c.g[0], c.g[1], 10); stars(c.g[0], c.g[1] - 50, 8); shake(4);
+          dust(c.g[0], c.g[1], 10); stars(c.g[0], c.g[1] - 50, 8); shake(4); sound('build');
         }
         c.initialised = true;
       }
@@ -310,7 +312,7 @@
       if (!tr) { tr = trucks[i] = { sp: sprite('truck_' + type, roadLayer), type, puff: 0 }; tr.sp.sx = tr.sp.sy = .2; to(tr.sp, { sx: 1, sy: 1 }, .7, 'outElastic'); }
       else if (tr.type !== type) {
         const up = type > tr.type; setTexture(tr.sp, 'truck_' + type); tr.type = type;
-        if (up) { tr.sp.sx = 1.3; tr.sp.sy = .5; applyScale(tr.sp); to(tr.sp, { sx: 1, sy: 1 }, .8, 'outElastic'); stars(tr.sp.x, tr.sp.y - 30, 8); }
+        if (up) { tr.sp.sx = 1.3; tr.sp.sy = .5; applyScale(tr.sp); to(tr.sp, { sx: 1, sy: 1 }, .8, 'outElastic'); stars(tr.sp.x, tr.sp.y - 30, 8); sound('build'); }
       }
       const x = truckX(i) + len / 2, air = type >= 5;
       tr.sp.position.set(x, 482 - (air ? Math.sin(t * 2.5 + i) * 4 : Math.abs(Math.sin(t * 12 + i)) * 1.5));
@@ -350,10 +352,10 @@
     const d = drones.splice(i, 1)[0], c = d.c;
     const x = c.x, y = c.y + 34;
     // Crate drops and bursts; drone zips away
-    d.crate.visible = false; d.rope.visible = false;
+    d.crate.visible = false; d.rope.visible = false; sound('whoosh');
     const crate = sprite('crate', fxLayer); crate.position.set(x, y - 16);
     anim(.35, k => { crate.y = y - 16 + k * 30; crate.rotation = k * .6; }, { ease: 'inQuad', owner: crate, done: () => {
-      kill(crate); confetti(x, y + 14, 24); stars(x, y + 14, 10);
+      kill(crate); confetti(x, y + 14, 24); stars(x, y + 14, 10); sound('crate');
       particle('puff', x, y + 14, { life: .5, size: .8, grow: 1.4 });
     } });
     to(c, { y: c.y - 220, x: c.x + Math.sign(d.vx) * 160 }, .8, 'inQuad', { done: () => kill(c) });
@@ -366,7 +368,7 @@
     const dt = Math.min(.05, app.ticker.deltaMS / 1000); t += dt;
     const st = getState();
     const pi = st.expansions % A.PALETTES.length;
-    if (pi !== paletteIdx) { paletteIdx = pi; setTexture(sky, 'sky_' + pi); setTexture(ground, 'ground_' + pi); }
+    if (pi !== paletteIdx) { paletteIdx = pi; setTexture(sky, 'sky_' + pi); setTexture(ground, 'ground_' + pi); if (window.FarmAudio) FarmAudio.setSong(pi); }
     if (tierShown !== st.tier) { tierShown = st.tier; setTexture(flagEgg, 'egg_' + st.tier); }
     rays.rotation += dt * .15; sun.sx = sun.sy = 1 + Math.sin(t * 1.5) * .03; applyScale(sun);
     clouds.forEach(c => { c.x += c.speed * dt; if (c.x > W + 100) c.x = -100; });
