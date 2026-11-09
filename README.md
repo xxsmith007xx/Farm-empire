@@ -2,7 +2,7 @@
 
 Static idle farm game. Serve this directory over HTTP (for example `python3 -m http.server 8765`) and open `http://localhost:8765`.
 
-The 3D farm adapts the supplied Farm Empire preview's low-poly chickens and buildings. `farm-3d.js` reads a small visual snapshot and invokes the original tap action. The original game retains ownership of all economy, upgrade, research, prestige, delivery, import/export, offline income, and save logic. The `sunny-acres-v2` localStorage key and save schema are unchanged. The preview's separate economy, reset button, and save key are not imported.
+The 3D farm adapts the supplied Farm Empire preview's low-poly chickens and buildings. `farm-3d.js` reads a small visual snapshot and invokes the original tap action. The game owns economy and save state independently of the renderer. V2.2 moves deterministic economy rules into economy.js; legacy runs retain their original income, prices and rewards until optional prestige. The `sunny-acres-v2` localStorage key is unchanged; later versions migrate save metadata additively (see the V2.2 section). The preview's separate economy, reset button, and save key are not imported.
 
 Three.js 0.160.1 is bundled in `vendor/`, with its MIT license; no runtime CDN is required. Failed module loads, unavailable WebGL, rendering errors and context loss retain the original 2D renderer. Use the scene button to select 2D manually. Rendering is capped at 30 fps and 1.5 pixel ratio, uses shared low-poly geometry, no shadows, bounded model counts, reduced-motion support, and pauses while hidden or outside the viewport. Vertical touch scrolling remains available; 3D collection happens only on a short pointer release.
 
@@ -31,7 +31,7 @@ WebKit was downloaded but could not launch because this environment lacks libgtk
 
 The farm grows from Homestead through Growing Acres, Country Estate, Harvest Hub and Landmark. Existing coop/feed/hatchery/drone upgrades and farm level determine property growth and landscaping. Coop purchases add visible coops (up to seven); coop and hatchery milestones enlarge the barn; feed and hatchery add silos. Truck levels 2/4/6 advance the delivery fleet, with trailers from level 4. These are visual rewards; costs and income are unchanged. Geometry is allocated once and reused, with capped scene counts.
 
-`farm-model.js` is the shared milestone and save boundary. Legacy `sunny-acres-v2` saves migrate additively to schema 3: all economy fields stay in place, `properties` registers the stable `sunny-acres` home, and `activePropertyId` identifies it. Migration is idempotent; import fills missing upgrade/research defaults. Prestige retains property metadata while resetting the same economy fields as before. Explicit full reset still resets everything. Future property records survive but are neither selectable nor income-producing. A later ownership feature can move the unchanged economy into per-property state, retaining Sunny Acres under its stable ID; no new purchase, building-placement or passive-property economy exists yet.
+`farm-model.js` is the shared milestone and save boundary. V2.1 introduced schema 3 (V2.2 advances metadata to schema 4): all economy fields stay in place, `properties` registers the stable `sunny-acres` home, and `activePropertyId` identifies it. Migration is idempotent; import fills missing upgrade/research defaults. Prestige retains property metadata while resetting the same economy fields as before. Explicit full reset still resets everything. Future property records survive but are neither selectable nor income-producing. A later ownership feature can move the unchanged economy into per-property state, retaining Sunny Acres under its stable ID; no new purchase, building-placement or passive-property economy exists yet.
 
 Additional checks:
 
@@ -41,3 +41,17 @@ node tests/milestones.cjs
 ```
 
 These cover legacy field preservation, migration idempotence, retained future metadata, bounded/monotonic progression, five mobile rendered milestone states and browser save migration. `tests/gameplay.cjs` compares original economy fields while independently checking property metadata survives prestige. Screenshots from the milestone suite are saved to the OS temporary directory.
+
+## V2.2 Compounding Momentum (feature branch only)
+
+V2.2 adds optional prestige with explicit reset/retention summaries, achievable purchase goals, and a storage/shipping buffer that automatically sells overflow instead of stopping production. The stable Sunny Acres property and all property records survive every prestige. Existing saves keep their original economy until the player chooses prestige; new games use V2.2. No additional property income is implemented.
+
+Balance decisions, save boundaries, reproduction steps and five-cycle timings are in [docs/progression-v2.2.md](docs/progression-v2.2.md); measured output is in [docs/progression-v2.2.json](docs/progression-v2.2.json). The shared `economy.js` powers gameplay, tests and the simulator.
+
+```
+node tests/economy.cjs
+node scripts/simulate-economy.cjs
+node tests/momentum-browser.cjs
+```
+
+This feature has not been deployed. The existing Pages preview remains on V2.1.

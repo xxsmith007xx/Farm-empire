@@ -1,0 +1,659 @@
+{
+  "assumptions": "1s decisions; affordable marginal-ROI upgrades/research. Idle: no clicks/delivery. Active: 1 tap/s and express every45s. Prestige at target. No offline time. Not measured player behavior.",
+  "idle": [
+    {
+      "run": 1,
+      "seeds": 0,
+      "multiplier": 1,
+      "seconds": 282,
+      "firstBuy": 18,
+      "buys": 18,
+      "maxPurchaseWait": 28,
+      "milestones": {
+        "10": 15,
+        "50": 60,
+        "100": 96,
+        "500": 200,
+        "1000": 282
+      },
+      "reward": 5,
+      "income": 22.307454293627366,
+      "upgrades": {
+        "chickens": 14,
+        "coops": 3,
+        "trucks": 2,
+        "feed": 0,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 0,
+        "speed": 0,
+        "offline": 0
+      }
+    },
+    {
+      "run": 2,
+      "seeds": 5,
+      "multiplier": 1.9,
+      "seconds": 194,
+      "firstBuy": 10,
+      "buys": 18,
+      "maxPurchaseWait": 21,
+      "milestones": {
+        "10": 8,
+        "50": 32,
+        "100": 61,
+        "500": 135,
+        "1000": 194
+      },
+      "reward": 5,
+      "income": 42.38416315789199,
+      "upgrades": {
+        "chickens": 14,
+        "coops": 3,
+        "trucks": 2,
+        "feed": 0,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 0,
+        "speed": 0,
+        "offline": 0
+      }
+    },
+    {
+      "run": 3,
+      "seeds": 10,
+      "multiplier": 2.8,
+      "seconds": 163,
+      "firstBuy": 7,
+      "buys": 18,
+      "maxPurchaseWait": 17,
+      "milestones": {
+        "10": 6,
+        "50": 22,
+        "100": 42,
+        "500": 127,
+        "1000": 163
+      },
+      "reward": 5,
+      "income": 62.46087202215662,
+      "upgrades": {
+        "chickens": 14,
+        "coops": 3,
+        "trucks": 2,
+        "feed": 0,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 0,
+        "speed": 0,
+        "offline": 0
+      }
+    },
+    {
+      "run": 4,
+      "seeds": 15,
+      "multiplier": 3.6999999999999997,
+      "seconds": 137,
+      "firstBuy": 5,
+      "buys": 18,
+      "maxPurchaseWait": 13,
+      "milestones": {
+        "10": 4,
+        "50": 17,
+        "100": 32,
+        "500": 104,
+        "1000": 137
+      },
+      "reward": 5,
+      "income": 82.53758088642125,
+      "upgrades": {
+        "chickens": 14,
+        "coops": 3,
+        "trucks": 2,
+        "feed": 0,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 0,
+        "speed": 0,
+        "offline": 0
+      }
+    },
+    {
+      "run": 5,
+      "seeds": 20,
+      "multiplier": 4.6,
+      "seconds": 120,
+      "firstBuy": 4,
+      "buys": 18,
+      "maxPurchaseWait": 11,
+      "milestones": {
+        "10": 4,
+        "50": 13,
+        "100": 26,
+        "500": 93,
+        "1000": 120
+      },
+      "reward": 5,
+      "income": 102.61428975068588,
+      "upgrades": {
+        "chickens": 14,
+        "coops": 3,
+        "trucks": 2,
+        "feed": 0,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 0,
+        "speed": 0,
+        "offline": 0
+      }
+    }
+  ],
+  "active": [
+    {
+      "run": 1,
+      "seeds": 0,
+      "multiplier": 1,
+      "seconds": 169,
+      "firstBuy": 8,
+      "buys": 18,
+      "maxPurchaseWait": 16,
+      "milestones": {
+        "10": 6,
+        "50": 28,
+        "100": 45,
+        "500": 130,
+        "1000": 169
+      },
+      "reward": 5,
+      "income": 21.521137712241174,
+      "upgrades": {
+        "chickens": 14,
+        "coops": 3,
+        "trucks": 1,
+        "feed": 0,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 1,
+        "speed": 0,
+        "offline": 0
+      }
+    },
+    {
+      "run": 2,
+      "seeds": 5,
+      "multiplier": 1.9,
+      "seconds": 107,
+      "firstBuy": 6,
+      "buys": 18,
+      "maxPurchaseWait": 11,
+      "milestones": {
+        "10": 5,
+        "50": 20,
+        "100": 38,
+        "500": 90,
+        "1000": 107
+      },
+      "reward": 5,
+      "income": 39.637713157891994,
+      "upgrades": {
+        "chickens": 13,
+        "coops": 3,
+        "trucks": 2,
+        "feed": 0,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 1,
+        "speed": 0,
+        "offline": 0
+      }
+    },
+    {
+      "run": 3,
+      "seeds": 10,
+      "multiplier": 2.8,
+      "seconds": 85,
+      "firstBuy": 5,
+      "buys": 18,
+      "maxPurchaseWait": 8,
+      "milestones": {
+        "10": 4,
+        "50": 15,
+        "100": 29,
+        "500": 63,
+        "1000": 85
+      },
+      "reward": 5,
+      "income": 58.413472022156625,
+      "upgrades": {
+        "chickens": 13,
+        "coops": 3,
+        "trucks": 2,
+        "feed": 0,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 1,
+        "speed": 0,
+        "offline": 0
+      }
+    },
+    {
+      "run": 4,
+      "seeds": 15,
+      "multiplier": 3.6999999999999997,
+      "seconds": 67,
+      "firstBuy": 4,
+      "buys": 18,
+      "maxPurchaseWait": 7,
+      "milestones": {
+        "10": 3,
+        "50": 12,
+        "100": 22,
+        "500": 49,
+        "1000": 67
+      },
+      "reward": 5,
+      "income": 79.62820953529234,
+      "upgrades": {
+        "chickens": 14,
+        "coops": 3,
+        "trucks": 1,
+        "feed": 0,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 1,
+        "speed": 0,
+        "offline": 0
+      }
+    },
+    {
+      "run": 5,
+      "seeds": 20,
+      "multiplier": 4.6,
+      "seconds": 51,
+      "firstBuy": 3,
+      "buys": 15,
+      "maxPurchaseWait": 6,
+      "milestones": {
+        "10": 3,
+        "50": 10,
+        "100": 18,
+        "500": 45,
+        "1000": 51
+      },
+      "reward": 5,
+      "income": 154.40382999999994,
+      "upgrades": {
+        "chickens": 11,
+        "coops": 3,
+        "trucks": 0,
+        "feed": 1,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 0,
+        "speed": 1,
+        "offline": 0
+      }
+    }
+  ],
+  "stretch": [
+    {
+      "run": 1,
+      "seeds": 0,
+      "multiplier": 1,
+      "seconds": 250,
+      "firstBuy": 8,
+      "buys": 45,
+      "maxPurchaseWait": 16,
+      "milestones": {
+        "10": 6,
+        "50": 28,
+        "100": 45,
+        "500": 130,
+        "1000": 169,
+        "3000": 220,
+        "10000": 250
+      },
+      "reward": 16,
+      "income": 360.24984877089673,
+      "upgrades": {
+        "chickens": 24,
+        "coops": 8,
+        "trucks": 6,
+        "feed": 3,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 3,
+        "speed": 2,
+        "offline": 0
+      }
+    },
+    {
+      "run": 2,
+      "seeds": 16,
+      "multiplier": 3.88,
+      "seconds": 90,
+      "firstBuy": 4,
+      "buys": 35,
+      "maxPurchaseWait": 7,
+      "milestones": {
+        "10": 3,
+        "50": 12,
+        "100": 21,
+        "500": 48,
+        "1000": 64,
+        "3000": 84,
+        "10000": 90
+      },
+      "reward": 19,
+      "income": 755.3105992690282,
+      "upgrades": {
+        "chickens": 19,
+        "coops": 7,
+        "trucks": 3,
+        "feed": 2,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 3,
+        "speed": 2,
+        "offline": 0
+      }
+    },
+    {
+      "run": 3,
+      "seeds": 35,
+      "multiplier": 7.3,
+      "seconds": 56,
+      "firstBuy": 2,
+      "buys": 30,
+      "maxPurchaseWait": 4,
+      "milestones": {
+        "10": 2,
+        "50": 7,
+        "100": 12,
+        "500": 35,
+        "1000": 43,
+        "3000": 45,
+        "10000": 56
+      },
+      "reward": 15,
+      "income": 2060.3217876346735,
+      "upgrades": {
+        "chickens": 16,
+        "coops": 6,
+        "trucks": 1,
+        "feed": 3,
+        "hatchery": 1,
+        "drones": 0
+      },
+      "research": {
+        "tap": 2,
+        "speed": 2,
+        "offline": 0
+      }
+    }
+  ],
+  "higherGoals": [
+    {
+      "run": 1,
+      "seeds": 0,
+      "multiplier": 1,
+      "seconds": 272,
+      "firstBuy": 8,
+      "buys": 64,
+      "maxPurchaseWait": 16,
+      "milestones": {
+        "10": 6,
+        "50": 28,
+        "100": 45,
+        "500": 130,
+        "1000": 169,
+        "3000": 220,
+        "10000": 250,
+        "30000": 268,
+        "100000": 272
+      },
+      "reward": 50,
+      "income": 9170.805410772573,
+      "upgrades": {
+        "chickens": 27,
+        "coops": 12,
+        "trucks": 7,
+        "feed": 6,
+        "hatchery": 3,
+        "drones": 1
+      },
+      "research": {
+        "tap": 5,
+        "speed": 4,
+        "offline": 0
+      }
+    },
+    {
+      "run": 2,
+      "seeds": 50,
+      "multiplier": 10,
+      "seconds": 58,
+      "firstBuy": 2,
+      "buys": 42,
+      "maxPurchaseWait": 3,
+      "milestones": {
+        "10": 2,
+        "50": 5,
+        "100": 9,
+        "500": 27,
+        "1000": 33,
+        "3000": 41,
+        "10000": 45,
+        "30000": 45,
+        "100000": 58
+      },
+      "reward": 50,
+      "income": 11165.720886662299,
+      "upgrades": {
+        "chickens": 20,
+        "coops": 8,
+        "trucks": 3,
+        "feed": 4,
+        "hatchery": 2,
+        "drones": 0
+      },
+      "research": {
+        "tap": 3,
+        "speed": 3,
+        "offline": 0
+      }
+    },
+    {
+      "run": 3,
+      "seeds": 100,
+      "multiplier": 19,
+      "seconds": 43,
+      "firstBuy": 1,
+      "buys": 41,
+      "maxPurchaseWait": 2,
+      "milestones": {
+        "10": 1,
+        "50": 3,
+        "100": 5,
+        "500": 14,
+        "1000": 18,
+        "3000": 24,
+        "10000": 29,
+        "30000": 36,
+        "100000": 43
+      },
+      "reward": 53,
+      "income": 20246.837111458368,
+      "upgrades": {
+        "chickens": 19,
+        "coops": 8,
+        "trucks": 3,
+        "feed": 4,
+        "hatchery": 2,
+        "drones": 0
+      },
+      "research": {
+        "tap": 3,
+        "speed": 3,
+        "offline": 0
+      }
+    }
+  ],
+  "recordChase": [
+    {
+      "run": 1,
+      "seeds": 0,
+      "multiplier": 1,
+      "seconds": 169,
+      "firstBuy": 8,
+      "buys": 18,
+      "maxPurchaseWait": 16,
+      "milestones": {
+        "10": 6,
+        "50": 28,
+        "100": 45,
+        "500": 130,
+        "1000": 169
+      },
+      "reward": 5,
+      "income": 21.521137712241174,
+      "upgrades": {
+        "chickens": 14,
+        "coops": 3,
+        "trucks": 1,
+        "feed": 0,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 1,
+        "speed": 0,
+        "offline": 0
+      }
+    },
+    {
+      "run": 2,
+      "seeds": 5,
+      "multiplier": 1.9,
+      "seconds": 160,
+      "firstBuy": 6,
+      "buys": 45,
+      "maxPurchaseWait": 11,
+      "milestones": {
+        "10": 5,
+        "50": 20,
+        "100": 38,
+        "500": 90,
+        "1000": 107,
+        "3000": 139,
+        "10000": 160
+      },
+      "reward": 16,
+      "income": 728.5673579688596,
+      "upgrades": {
+        "chickens": 23,
+        "coops": 9,
+        "trucks": 6,
+        "feed": 3,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 3,
+        "speed": 2,
+        "offline": 0
+      }
+    },
+    {
+      "run": 3,
+      "seeds": 21,
+      "multiplier": 4.779999999999999,
+      "seconds": 84,
+      "firstBuy": 3,
+      "buys": 49,
+      "maxPurchaseWait": 6,
+      "milestones": {
+        "10": 3,
+        "50": 10,
+        "100": 18,
+        "500": 45,
+        "1000": 50,
+        "3000": 63,
+        "10000": 72,
+        "30000": 78,
+        "100000": 84
+      },
+      "reward": 50,
+      "income": 19606.41439260896,
+      "upgrades": {
+        "chickens": 22,
+        "coops": 9,
+        "trucks": 4,
+        "feed": 5,
+        "hatchery": 3,
+        "drones": 1
+      },
+      "research": {
+        "tap": 3,
+        "speed": 3,
+        "offline": 0
+      }
+    }
+  ],
+  "legacyFirst": [
+    {
+      "run": 1,
+      "seeds": 0,
+      "multiplier": 1,
+      "seconds": 160,
+      "firstBuy": 22,
+      "buys": 14,
+      "maxPurchaseWait": 22,
+      "milestones": {
+        "10": 15,
+        "50": 44,
+        "100": 61,
+        "500": 129,
+        "1000": 160
+      },
+      "reward": 5,
+      "income": 26.081999999999997,
+      "upgrades": {
+        "chickens": 12,
+        "coops": 2,
+        "trucks": 1,
+        "feed": 0,
+        "hatchery": 0,
+        "drones": 0
+      },
+      "research": {
+        "tap": 0,
+        "speed": 0,
+        "offline": 0
+      }
+    }
+  ]
+}

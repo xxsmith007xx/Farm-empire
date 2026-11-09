@@ -1,7 +1,7 @@
 const {chromium, webkit} = require('playwright');
 const assert = require('node:assert/strict');
 const root = require('node:path').resolve(__dirname,'..');
-function legacy(s){delete s.schemaVersion;delete s.properties;delete s.activePropertyId;return s;}
+function legacy(s){delete s.economyVersion;delete s.logistics;delete s.bestHarvest;delete s.schemaVersion;delete s.properties;delete s.activePropertyId;return s;}
 const origin='http://127.0.0.1:8765';
 const seed={coins:1e8,earned:1e8,allTime:2e8,seeds:17,world:2,u:{chickens:42,coops:3,trucks:4,feed:2,hatchery:1,drones:1},r:{tap:2,speed:3,offline:4},last:1700000000000-3600000,express:0,properties:{'sunny-acres':{id:'sunny-acres',name:'Sunny Acres',custom:7},orchard:{id:'orchard',reserved:true}}};
 async function open(browser, original=false, block=false) {
@@ -15,7 +15,7 @@ async function open(browser, original=false, block=false) {
  await page.goto(origin+'/index.html');await new Promise(resolve=>setTimeout(resolve,500));
  return {context,page,errors};
 }
-async function state(page){return page.evaluate(()=>{window.dispatchEvent(new Event('pagehide'));const s=JSON.parse(localStorage.getItem('sunny-acres-v2'));delete s.schemaVersion;delete s.properties;delete s.activePropertyId;return s;});}
+async function state(page){return page.evaluate(()=>{window.dispatchEvent(new Event('pagehide'));const s=JSON.parse(localStorage.getItem('sunny-acres-v2'));delete s.economyVersion;delete s.logistics;delete s.bestHarvest;delete s.schemaVersion;delete s.properties;delete s.activePropertyId;return s;});}
 async function exercise(page){
  await page.locator('#collect').evaluate(e=>e.click());await page.locator('#delivery').evaluate(e=>e.click());
  await page.locator('[data-tab="upgrades"]').evaluate(e=>e.click());
@@ -34,7 +34,8 @@ async function exercise(page){
  for(const p of [old.page,modern.page]){
   await p.locator('[data-tab="world"]').evaluate(e=>e.click());p.once('dialog',d=>d.accept());await p.locator('#prestige').evaluate(e=>e.click());
  }
- assert.deepEqual(await state(old.page),await state(modern.page),'prestige compatibility');
+ const beforeNext=await state(old.page),afterNext=await state(modern.page);for(const k of ['coins','earned','allTime','seeds','world','u','r'])assert.deepEqual(afterNext[k],beforeNext[k],'prestige preserves '+k);
+ assert.equal(await modern.page.evaluate(()=>JSON.parse(localStorage.getItem('sunny-acres-v2')).economyVersion),2,'legacy opts in on prestige');
  const p=modern.page;
  const metadata=await p.evaluate(()=>JSON.parse(localStorage.getItem('sunny-acres-v2')));assert.equal(metadata.properties['sunny-acres'].custom,7);assert.equal(metadata.properties.orchard.reserved,true,'prestige retains future property records');
  await p.evaluate(()=>{navigator.clipboard.writeText=async text=>{window.testSaveCode=text;};});
