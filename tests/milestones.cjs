@@ -8,7 +8,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
    const {expected,actual}=await p.evaluate(()=>({expected:FarmModel.milestones(window.farmView.snapshot()),actual:JSON.parse(document.querySelector('.farm3d').dataset.rendered)}));
    assert.equal(actual.coops,expected.coops);assert.equal(actual.silos,expected.silos);assert.equal(actual.trees,expected.landscaping);assert.equal(actual.paths,expected.paths);assert.equal(actual.fences,expected.fences);assert.equal(actual.land,expected.land);assert.equal(actual.barn,1+expected.barn*.13);assert.equal(actual.trailers,expected.vehicle>=2?expected.trucks:0);
    await p.evaluate(()=>dispatchEvent(new Event('pagehide')));
-   const migrated=await p.evaluate(()=>JSON.parse(localStorage.getItem('sunny-acres-v2')));assert.equal(migrated.schemaVersion,3);assert.equal(migrated.activePropertyId,'sunny-acres');assert.equal(migrated.seeds,3);
+   const migrated=await p.evaluate(()=>JSON.parse(localStorage.getItem('sunny-acres-v2')));assert.equal(migrated.schemaVersion,4);assert.equal(migrated.activePropertyId,'sunny-acres');assert.equal(migrated.seeds,3);
    await p.screenshot({path:require('node:path').join(require('node:os').tmpdir(),'farm-tier-'+level+'.png')});await p.close();
  }
  assert.deepEqual(errors,[]);await b.close();console.log('PASS mobile rendered milestones and legacy-save browser migration at five progression levels.');
