@@ -1,6 +1,6 @@
 # 🐔 Farm Empire: Sunny Acres
 
-An idle / incremental chicken-farm game that runs entirely in the browser. No build step, no dependencies, works offline once loaded, and is mobile-first.
+An idle / incremental chicken-farm game that runs entirely in the browser. No build step, works offline, and is mobile-first. Graphics use PixiJS (WebGL, with a canvas fallback); animations respect the device's "reduce motion" setting.
 
 **Play:** open `index.html` in a browser, or serve the folder (`npm start` → http://localhost:8080). It also works on GitHub Pages: point Pages at the repo root.
 
@@ -24,7 +24,10 @@ Progress autosaves to `localStorage`. Use *More → Copy save code* to move a sa
 | `index.html` | Page structure |
 | `css/style.css` | Styles |
 | `js/engine.js` | All game rules and balance data (pure logic, no DOM, so it's testable in Node) |
-| `js/scene.js` | Animated canvas farm: coops, trucks, flock, drones, effects |
+| `js/art.js` | Sprite catalogue: every picture, its size and anchor, with placeholder art (see [ART_GUIDE.md](ART_GUIDE.md) to swap in real artwork) |
+| `js/scene.js` | Animated farm, rendered with [PixiJS](https://pixijs.com/): hopping chickens, hatching, buildings, trucks, drones, particles |
+| `js/fx.js` | Interface effects: coins flying to counters, rolling numbers, button pops and sparkles |
+| `vendor/pixi-legacy.min.js` | PixiJS 7.4.2 (MIT licence), bundled so the game works offline and inside an app |
 | `js/ui.js` | Game loop, saving/offline progress, input, menus, sound |
 | `tests/engine.test.js` | Unit tests for the engine |
 

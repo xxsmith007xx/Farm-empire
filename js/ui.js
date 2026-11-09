@@ -1,7 +1,8 @@
 /* Farm Empire — UI controller: wires the engine to the DOM and the canvas. */
 (function () {
   'use strict';
-  const E = window.FarmEngine, S = window.FarmScene, fmt = E.fmt;
+  const E = window.FarmEngine, S = window.FarmScene, FX = window.FarmFX, fmt = E.fmt;
+  const COIN = FX.icon('coin'), GEM = FX.icon('gem');
   const KEY = 'farm-empire-v3', OLD_KEY = 'sunny-acres-v2';
   const $ = id => document.getElementById(id);
 
@@ -52,6 +53,7 @@
     $('modal').classList.remove('hide');
   }
   const confirmModal = (title, body, yes, fn) => modal(title, body, [{ label: 'Cancel', cls: 'alt' }, { label: yes, fn }]);
+  const hero = key => '<div class="hero"><div class="rays"></div><img src="' + window.FarmArt.dataURL(key) + '" alt=""></div>';
   const dur = sec => sec >= 3600 ? Math.floor(sec / 3600) + 'h ' + Math.floor(sec % 3600 / 60) + 'm' : sec >= 60 ? Math.floor(sec / 60) + 'm ' + Math.floor(sec % 60) + 's' : Math.ceil(sec) + 's';
 
   // ---------- Lists (built once, refreshed in place) ----------
@@ -73,14 +75,14 @@
     for (let i = 0; i < 4; i++) rows.coop.push(makeRow($('coopList'), () => buySlot('coop', i)));
     for (let i = 0; i < 6; i++) rows.truck.push(makeRow($('truckList'), () => buySlot('truck', i)));
     E.RESEARCH.forEach(r => rows.research.push(makeRow($('researchList'), () => {
-      const n = E.buyResearch(s, r.id, buyN === 'max' ? Infinity : buyN);
-      if (n) { sfx.buy(); toast(r.name + (n > 1 ? ' +' + n + ' levels' : ' upgraded')); refresh(true); }
-      else { sfx.no(); toast('Not enough coins'); }
+      const n = E.buyResearch(s, r.id, buyN === 'max' ? Infinity : buyN), row = rows.research[E.RESEARCH.indexOf(r)];
+      if (n) { sfx.buy(); bought(row); toast(r.name + (n > 1 ? ' +' + n + ' levels' : ' upgraded')); refresh(true); }
+      else { sfx.no(); FX.nudge(row.btn); toast('Not enough coins'); }
     })));
     E.PERKS.forEach(p => {
       const r = makeRow($('perkList'), () => {
-        if (E.buyPerk(s, p.id)) { sfx.buy(); toast(p.name + ' upgraded!'); refresh(true); save(); }
-        else { sfx.no(); toast('Not enough gems'); }
+        if (E.buyPerk(s, p.id)) { sfx.buy(); bought(r); toast(p.name + ' upgraded!'); refresh(true); save(); }
+        else { sfx.no(); FX.nudge(r.btn); toast('Not enough gems'); }
       });
       r.btn.classList.add('gem'); rows.perk.push(r);
     });
@@ -93,10 +95,16 @@
 
   function buySlot(kind, i) {
     const list = kind === 'coop' ? E.COOPS : E.TRUCKS, arr = kind === 'coop' ? s.coops : s.trucks;
+    const row = rows[kind][i];
     if (E.buySlot(s, kind, i)) {
-      sfx.buy(); toast((arr[i] === 0 ? 'Built ' : 'Upgraded to ') + list[arr[i]].name + '!');
-      S.burst(400, 300, 10); refresh(true); save();
-    } else { sfx.no(); toast(arr[i] >= list.length - 1 ? 'Already the best!' : 'Not enough coins'); }
+      sfx.buy(); bought(row); toast((arr[i] === 0 ? 'Built ' : 'Upgraded to ') + list[arr[i]].name + '!');
+      refresh(true); save();
+    } else { sfx.no(); FX.nudge(row.btn); toast(arr[i] >= list.length - 1 ? 'Already the best!' : 'Not enough coins'); }
+  }
+  // Purchase feedback: the button and its icon pop, stars burst out.
+  function bought(row) {
+    FX.pop(row.btn, .12); FX.pop(row.ico, .3); FX.sparkle(row.btn, 8);
+    row.ico.animate && row.ico.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(-12deg)' }, { transform: 'rotate(10deg)' }, { transform: 'rotate(0)' }], { duration: 400 });
   }
 
   function refreshSlots(kind) {
@@ -109,7 +117,7 @@
       set(r.name, 'textContent', ty >= 0 ? list[ty].name : 'Empty slot ' + (i + 1));
       set(r.desc, 'textContent', ty >= 0 ? 'Holds ' + fmt(list[ty].cap) + ' ' + factor + (next ? ' → ' + next.name + ' (' + fmt(next.cap) + ')' : ' · fully upgraded') : 'Build a ' + list[0].name + ' (' + fmt(list[0].cap) + ' ' + factor + ')');
       pips(r, list.length, list.length, ty + 1);
-      const label = next ? (ty < 0 ? 'Build' : 'Upgrade') + '<small>🪙 ' + fmt(cost) + '</small>' : 'MAX';
+      const label = next ? (ty < 0 ? 'Build' : 'Upgrade') + '<small>' + COIN + ' ' + fmt(cost) + '</small>' : 'MAX';
       set(r.btn, 'innerHTML', label);
       r.btn.disabled = !next || s.coins < cost;
     });
@@ -124,7 +132,7 @@
       set(r.name, 'innerHTML', def.name + ' <span class="muted">' + lv + '/' + def.max + '</span>');
       set(r.desc, 'textContent', def.desc);
       pips(r, Math.min(def.max, 10), def.max, Math.round(lv / def.max * Math.min(def.max, 10)));
-      set(r.btn, 'innerHTML', max ? 'MAX' : (n > 1 ? '+' + n + ' ' : '') + '<small>🪙 ' + fmt(total) + '</small>');
+      set(r.btn, 'innerHTML', max ? 'MAX' : (n > 1 ? '+' + n + ' ' : '') + '<small>' + COIN + ' ' + fmt(total) + '</small>');
       r.btn.disabled = max || s.coins < total;
     });
   }
@@ -136,7 +144,7 @@
       set(r.name, 'innerHTML', p.name + ' <span class="muted">' + lv + '/' + p.max + '</span>');
       set(r.desc, 'textContent', p.desc);
       pips(r, Math.min(p.max, 10), p.max, Math.round(lv / p.max * Math.min(p.max, 10)));
-      set(r.btn, 'innerHTML', max ? 'MAX' : '<small>💎 ' + cost + '</small>');
+      set(r.btn, 'innerHTML', max ? 'MAX' : '<small>' + GEM + ' ' + cost + '</small>');
       r.btn.disabled = max || s.gems < cost;
     });
   }
@@ -147,7 +155,7 @@
     const key = done + ':' + E.ACHIEVEMENTS.length;
     if ($('achList').dataset.key !== key) {
       $('achList').dataset.key = key;
-      $('achList').innerHTML = E.ACHIEVEMENTS.map(a => `<div class="ach ${s.achievements[a.id] ? 'done' : ''}"><b>${a.icon} ${a.name}</b><span>${a.desc} · 💎${a.gems}</span></div>`).join('');
+      $('achList').innerHTML = E.ACHIEVEMENTS.map(a => `<div class="ach ${s.achievements[a.id] ? 'done' : ''}"><b>${a.icon} ${a.name}</b><span>${a.desc} · ${GEM}${a.gems}</span></div>`).join('');
     }
     const st = s.stats, days = Math.floor((Date.now() - s.created) / 864e5);
     $('statList').innerHTML = [
@@ -160,12 +168,15 @@
 
   // ---------- Main refresh ----------
   let tab = 'farm', lastTier = '';
+  const counters = {
+    coins: FX.counter($('coins'), fmt), rate: FX.counter($('rate'), fmt),
+    chickens: FX.counter($('chickens'), v => fmt(Math.round(v))), gems: FX.counter($('gems'), v => fmt(Math.round(v)))
+  };
+  document.querySelector('.stat small').innerHTML = COIN + ' COINS';
+  document.querySelector('.gemstat small').innerHTML = GEM + ' GEMS';
   function refresh(force) {
     const d = E.derived(s), egg = E.EGGS[s.tier], next = E.EGGS[s.tier + 1];
-    $('coins').textContent = fmt(s.coins);
-    $('rate').textContent = fmt(d.income);
-    $('chickens').textContent = fmt(s.chickens);
-    $('gems').textContent = '💎 ' + fmt(s.gems);
+    counters.coins.set(s.coins); counters.rate.set(d.income); counters.chickens.set(s.chickens); counters.gems.set(s.gems);
     $('farmName').textContent = S.PALETTES[s.expansions % S.PALETTES.length].name + (s.expansions ? ' · Farm #' + (s.expansions + 1) : '');
     const eggKey = s.tier + ':' + E.canDiscover(s);
     if (lastTier !== eggKey) {
@@ -198,7 +209,7 @@
       $('rushBtn').disabled = s.rushCooldown > 0;
       $('rushBtn').textContent = s.rushCooldown > 0 ? '🚚 Ready in ' + dur(s.rushCooldown) : '🚚 Rush hour ×' + E.RUSH.mult;
       $('feastBtn').disabled = s.gems < E.FEAST.gems;
-      $('feastBtn').textContent = '🌽 Feed ×' + E.FEAST.mult + ' · 💎' + E.FEAST.gems;
+      set($('feastBtn'), 'innerHTML', '🌽 Feed ×' + E.FEAST.mult + ' · ' + GEM + E.FEAST.gems);
       $('boostHelp').textContent = 'Rush hour: ×' + E.RUSH.mult + ' income for ' + E.RUSH.duration + 's (free, every ' + E.RUSH.cooldown / 60 + ' min). Golden feed: ×' + E.FEAST.mult + ' for ' + E.FEAST.duration / 60 + ' min.';
       if (next) {
         const need = E.unlockCost(s.tier), pct = Math.min(100, s.tierEarned / need * 100);
@@ -247,6 +258,7 @@
     if (n <= 0) { if (s.tank < 1) toast('🐣 Hatchery is refilling…'); return; }
     s.stats.taps++;
     S.hatched(1);
+    FX.pop(document.querySelector('.hatchicon'), .25);
     if (x !== undefined) S.float(x, y, '+' + fmt(n) + ' 🐔', '#fff', 22);
     if (++hatchedSinceSound % 2) sfx.hatch();
     refresh();
@@ -290,16 +302,16 @@
       const e = E.EGGS[s.tier], d = E.derived(s);
       modal('🥚 ' + e.name, e.desc + '<span class="big">' + fmt(d.value * d.mult) + ' coins/egg</span>Egg ' + (s.tier + 1) + ' of ' + E.EGGS.length + '.');
     };
-    $('rushBtn').onclick = () => { if (E.rush(s)) { sfx.coin(); toast('🚚 Rush hour! ×' + E.RUSH.mult + ' income'); refresh(true); save(); } };
-    $('feastBtn').onclick = () => confirmModal('🌽 Golden feed', 'Spend 💎' + E.FEAST.gems + ' for ×' + E.FEAST.mult + ' income for ' + E.FEAST.duration / 60 + ' minutes?', 'Feed them!', () => {
-      if (E.feast(s)) { sfx.big(); toast('🌽 Golden feed! ×' + E.FEAST.mult + ' income'); refresh(true); save(); }
+    $('rushBtn').onclick = () => { if (E.rush(s)) { sfx.coin(); FX.pop($('rushBtn')); FX.sparkle($('rushBtn'), 10); S.shake(3); toast('🚚 Rush hour! ×' + E.RUSH.mult + ' income'); refresh(true); save(); } };
+    $('feastBtn').onclick = () => confirmModal('🌽 Golden feed', 'Spend ' + GEM + E.FEAST.gems + ' for ×' + E.FEAST.mult + ' income for ' + E.FEAST.duration / 60 + ' minutes?', 'Feed them!', () => {
+      if (E.feast(s)) { sfx.big(); FX.sparkle($('feastBtn'), 12); S.burst(400, 300, 40); toast('🌽 Golden feed! ×' + E.FEAST.mult + ' income'); refresh(true); save(); }
     });
     $('discoverBtn').onclick = () => {
       if (!E.canDiscover(s)) return;
       const next = E.EGGS[s.tier + 1];
       confirmModal('Discover the ' + next.name + '?', next.desc + '<br><br>Your farm will start over with the new egg: coins, coops, trucks and research reset, but every egg is worth <b>' + fmt(next.value / E.EGGS[s.tier].value) + '× more</b>. Golden Seeds, gems and perks are kept.', 'Discover!', () => {
-        E.discover(s); sfx.big(); S.burst(400, 200, 60); refresh(true); save();
-        modal('🎉 New egg!', 'You now produce the <b>' + next.name + '</b>.<span class="big">' + fmt(next.value) + ' base value</span>Hatch chickens and rebuild. It goes faster every time!');
+        E.discover(s); sfx.big(); S.celebrate(); FX.shake(document.querySelector('.app'), 8); refresh(true); save();
+        modal('🎉 New egg!', hero('egg_' + s.tier) + 'You now produce the <b>' + next.name + '</b>.<span class="big">' + fmt(next.value) + ' base value</span>Hatch chickens and rebuild. It goes faster every time!');
         checkAch();
       });
     };
@@ -307,7 +319,8 @@
       const r = E.prestigeReward(s);
       if (r < 1) return;
       confirmModal('🌟 Expand your farm?', 'You will move to new land with a fresh Farm Egg farm. Coins, eggs, buildings and research are reset.<span class="big">+' + fmt(r) + ' Golden Seeds</span>Income bonus goes from ×' + fmt(E.derived(s).mult) + ' to ×' + fmt(1 + (s.seeds + r) * (0.1 + 0.01 * s.perks.seedPower)) + '.', 'Expand!', () => {
-        E.prestige(s); sfx.big(); S.burst(400, 200, 80); refresh(true); save();
+        E.prestige(s); sfx.big(); S.celebrate(); FX.shake(document.querySelector('.app'), 10); refresh(true); save();
+        modal('🌟 New land!', hero('star') + 'Welcome to <b>' + S.PALETTES[s.expansions % S.PALETTES.length].name + '</b>.<span class="big">×' + fmt(E.derived(s).mult) + ' income</span>Your Golden Seeds make everything grow faster.');
         toast('🌍 Welcome to ' + S.PALETTES[s.expansions % S.PALETTES.length].name + '!');
         checkAch();
       });
@@ -316,7 +329,9 @@
       const g = E.openGift(s);
       if (!g) return;
       sfx.coin(); S.burst(740, 40, 24);
-      modal('🎁 Gift!', g.gems ? 'You found <span class="big">💎 ' + g.gems + ' gem' + (g.gems > 1 ? 's' : '') + '</span>' : 'A delivery bonus!<span class="big">🪙 ' + fmt(g.coins) + '</span>');
+      const from = $('gift');
+      FX.flyTo(from, g.gems ? $('gems').parentElement : $('coins').parentElement, g.gems ? g.gems * 2 : 10, g.gems ? 'gem' : 'coin');
+      modal('🎁 Gift!', hero(g.gems ? 'gem' : 'coin') + (g.gems ? 'You found <span class="big">' + g.gems + ' gem' + (g.gems > 1 ? 's' : '') + '</span>' : 'A delivery bonus!<span class="big">' + fmt(g.coins) + ' coins</span>'));
       refresh(true); save();
     };
     $('soundBtn').onclick = () => { s.settings.sound = !s.settings.sound; refresh(true); save(); };
@@ -348,13 +363,15 @@
   // ---------- Achievements ----------
   function checkAch() {
     E.checkAchievements(s).forEach((a, i) => setTimeout(() => {
-      sfx.coin(); toast('🏆 ' + a.name + ' · +💎' + a.gems);
+      sfx.coin(); toast('🏆 ' + a.name + ' · +' + a.gems + ' gems');
+      FX.flyTo([innerWidth / 2, 150], $('gems').parentElement, a.gems + 2, 'gem');
     }, i * 2600));
   }
 
   // ---------- Game loop ----------
   function welcomeBack(r) {
-    modal('🌙 Welcome back!', 'You were away for ' + dur(r.seconds) + '. Your farm kept running' + (r.counted < r.seconds ? ' (up to ' + dur(r.counted) + ')' : '') + ' at ' + Math.round(E.offlineRate(s) * 100) + '% speed.<span class="big">🪙 ' + fmt(r.coins) + '</span>', [{ label: 'Collect' , fn: sfx.coin }]);
+    modal('🌙 Welcome back!', hero('coin') + 'You were away for ' + dur(r.seconds) + '. Your farm kept running' + (r.counted < r.seconds ? ' (up to ' + dur(r.counted) + ')' : '') + ' at ' + Math.round(E.offlineRate(s) * 100) + '% speed.<span class="big">' + fmt(r.coins) + ' coins</span>',
+      [{ label: 'Collect', fn: () => { sfx.coin(); FX.flyTo([innerWidth / 2, innerHeight / 2], $('coins').parentElement, 12, 'coin'); } }]);
   }
   let lastUi = 0, lastSave = Date.now(), lastAch = 0;
   function loop() {
@@ -378,7 +395,8 @@
   S.init($('farm'), () => s, (x, y) => {
     const r = E.droneReward(s);
     sfx.coin();
-    S.float(x, y - 20, r.gems ? '+1 💎' : '+' + fmt(r.coins), r.gems ? '#9fd8ff' : '#ffe27a', 30);
+    S.float(x, y - 20, r.gems ? '+1 gem' : '+' + fmt(r.coins), r.gems ? '#9fd8ff' : '#ffe27a', 30);
+    FX.flyTo(S.toClient(x, y), (r.gems ? $('gems') : $('coins')).parentElement, r.gems ? 3 : 10, r.gems ? 'gem' : 'coin');
     toast(r.gems ? '🚁 Drone caught: +1 gem!' : '🚁 Drone caught: +' + fmt(r.coins) + ' coins');
     refresh();
   });

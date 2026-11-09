@@ -24,7 +24,7 @@ button:active:not(:disabled){transform:scale(.97)}
 /* Scene */
 .scene{position:relative;background:#90d9f8;overflow:hidden}
 .scene canvas{display:block;width:100%;height:auto;touch-action:manipulation;cursor:pointer}
-.hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;color:#fff;font-size:12px;font-weight:800;text-shadow:0 2px 4px #205b37;background:#174b437a;width:max-content;max-width:94%;margin:auto;padding:6px 13px;border-radius:30px;pointer-events:none;transition:opacity .6s}
+.hint{position:absolute;top:10px;left:0;right:0;text-align:center;color:#fff;font-size:12px;font-weight:800;text-shadow:0 2px 4px #205b37;background:#174b437a;width:max-content;max-width:94%;margin:auto;padding:6px 13px;border-radius:30px;pointer-events:none;transition:opacity .6s}
 .gift{position:absolute;top:10px;right:10px;font-size:34px;background:#fff;border:0;border-radius:16px;width:56px;height:56px;box-shadow:0 5px 16px #0003;animation:wobble 1.2s infinite}
 @keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-9deg)}75%{transform:rotate(9deg)}}
 
@@ -123,3 +123,23 @@ button:active:not(:disabled){transform:scale(.97)}
 
 @media (min-width:601px){.app{box-shadow:0 0 40px #174b4322}}
 @media (prefers-reduced-motion:reduce){.gift{animation:none}}
+
+/* ---------- Effects ---------- */
+.fx-sprite{position:fixed;left:0;top:0;pointer-events:none;z-index:50;will-change:transform}
+.ci{width:1.15em;height:1.15em;vertical-align:-.2em;display:inline-block}
+.ci.big{width:1.6em;height:1.6em;vertical-align:-.35em}
+.buy:not(:disabled){position:relative;overflow:hidden}
+.buy:not(:disabled)::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,#ffffff8c 45%,transparent 60%);transform:translateX(-120%);animation:shine 3.2s ease-in-out infinite}
+@keyframes shine{0%,55%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
+.tab .dot{animation:dotpulse 1.4s ease-in-out infinite}
+@keyframes dotpulse{50%{transform:scale(1.35)}}
+.hatch .hatchicon{transition:transform .08s}
+.hatch.held .hatchicon{transform:scale(1.12) rotate(-6deg)}
+.hero{position:relative;width:140px;height:120px;margin:0 auto 6px;display:grid;place-items:center}
+.hero img{position:relative;width:76px;height:auto;animation:herobob 1.6s ease-in-out infinite}
+.hero .rays{position:absolute;inset:-30px;border-radius:50%;background:repeating-conic-gradient(#ffd77333 0 12deg,transparent 12deg 30deg);animation:spin 9s linear infinite;-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes herobob{50%{transform:translateY(-6px) scale(1.04)}}
+.boostbar{animation:boostglow 1.2s ease-in-out infinite alternate}
+@keyframes boostglow{to{filter:brightness(1.12);box-shadow:0 0 14px #ffd77399}}
+@media (prefers-reduced-motion:reduce){.buy::after,.tab .dot,.hero img,.hero .rays,.boostbar{animation:none!important}}
