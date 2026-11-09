@@ -1,0 +1,9 @@
+{
+  "name": "Farm Empire: Sunny Acres",
+  "short_name": "Farm Empire",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#d8f1ed",
+  "theme_color": "#174b43",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
