@@ -1,8 +1,9 @@
 const {chromium, webkit} = require('playwright');
 const assert = require('node:assert/strict');
 const root = require('node:path').resolve(__dirname,'..');
+function legacy(s){delete s.schemaVersion;delete s.properties;delete s.activePropertyId;return s;}
 const origin='http://127.0.0.1:8765';
-const seed={coins:1e8,earned:1e8,allTime:2e8,seeds:17,world:2,u:{chickens:42,coops:3,trucks:4,feed:2,hatchery:1,drones:1},r:{tap:2,speed:3,offline:4},last:1700000000000-3600000,express:0};
+const seed={coins:1e8,earned:1e8,allTime:2e8,seeds:17,world:2,u:{chickens:42,coops:3,trucks:4,feed:2,hatchery:1,drones:1},r:{tap:2,speed:3,offline:4},last:1700000000000-3600000,express:0,properties:{'sunny-acres':{id:'sunny-acres',name:'Sunny Acres',custom:7},orchard:{id:'orchard',reserved:true}}};
 async function open(browser, original=false, block=false) {
  const context=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:3,isMobile:true,hasTouch:true});
  const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -14,7 +15,7 @@ async function open(browser, original=false, block=false) {
  await page.goto(origin+'/index.html');await new Promise(resolve=>setTimeout(resolve,500));
  return {context,page,errors};
 }
-async function state(page){return page.evaluate(()=>{window.dispatchEvent(new Event('pagehide'));return JSON.parse(localStorage.getItem('sunny-acres-v2'));});}
+async function state(page){return page.evaluate(()=>{window.dispatchEvent(new Event('pagehide'));const s=JSON.parse(localStorage.getItem('sunny-acres-v2'));delete s.schemaVersion;delete s.properties;delete s.activePropertyId;return s;});}
 async function exercise(page){
  await page.locator('#collect').evaluate(e=>e.click());await page.locator('#delivery').evaluate(e=>e.click());
  await page.locator('[data-tab="upgrades"]').evaluate(e=>e.click());
@@ -35,13 +36,14 @@ async function exercise(page){
  }
  assert.deepEqual(await state(old.page),await state(modern.page),'prestige compatibility');
  const p=modern.page;
+ const metadata=await p.evaluate(()=>JSON.parse(localStorage.getItem('sunny-acres-v2')));assert.equal(metadata.properties['sunny-acres'].custom,7);assert.equal(metadata.properties.orchard.reserved,true,'prestige retains future property records');
  await p.evaluate(()=>{navigator.clipboard.writeText=async text=>{window.testSaveCode=text;};});
  await p.locator('#exportSave').evaluate(e=>e.click());
- const code=await p.evaluate(()=>window.testSaveCode);assert.deepEqual(JSON.parse(Buffer.from(code,'base64').toString()),await state(p),'export matches save');
+ const code=await p.evaluate(()=>window.testSaveCode);assert.deepEqual(legacy(JSON.parse(Buffer.from(code,'base64').toString())),await state(p),'export matches save');
  p.once('dialog',async d=>{await d.accept(code);});
  p.on('dialog',async d=>{if(d.type()==='confirm')await d.accept();});
  await p.locator('#importSave').evaluate(e=>e.click());
- assert.deepEqual(JSON.parse(Buffer.from(code,'base64').toString()),await state(p),'import roundtrip');
+ assert.deepEqual(legacy(JSON.parse(Buffer.from(code,'base64').toString())),await state(p),'import roundtrip');
  await p.locator('[data-tab="farm"]').evaluate(e=>e.click());
  let before=await state(p);await p.locator('.farm3d').evaluate(e=>{e.dispatchEvent(new PointerEvent('pointerdown',{isPrimary:true,pointerId:1,clientX:150,clientY:120}));e.dispatchEvent(new PointerEvent('pointerup',{pointerId:1,clientX:150,clientY:120}));});assert((await state(p)).coins>before.coins,'3D touch earns');
  before=await state(p);

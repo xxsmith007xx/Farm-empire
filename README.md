@@ -26,3 +26,18 @@ Validated in this environment:
 - Animated WebGL rendering and real emulated touch input at an iPhone-sized viewport; portrait/landscape layout, screenshots visually inspected; no uncaught JS or WebGL errors.
 
 WebKit was downloaded but could not launch because this environment lacks libgtk-4, libgraphene, libharfbuzz-icu, libmanette, libhyphen and libGLESv2. Physical iPhone Safari, device performance/thermal behavior, and real iOS background/resume behavior still require device testing. Linux browser emulation does not establish those results.
+
+## V2.1 Living Farm Expansion
+
+The farm grows from Homestead through Growing Acres, Country Estate, Harvest Hub and Landmark. Existing coop/feed/hatchery/drone upgrades and farm level determine property growth and landscaping. Coop purchases add visible coops (up to seven); coop and hatchery milestones enlarge the barn; feed and hatchery add silos. Truck levels 2/4/6 advance the delivery fleet, with trailers from level 4. These are visual rewards; costs and income are unchanged. Geometry is allocated once and reused, with capped scene counts.
+
+`farm-model.js` is the shared milestone and save boundary. Legacy `sunny-acres-v2` saves migrate additively to schema 3: all economy fields stay in place, `properties` registers the stable `sunny-acres` home, and `activePropertyId` identifies it. Migration is idempotent; import fills missing upgrade/research defaults. Prestige retains property metadata while resetting the same economy fields as before. Explicit full reset still resets everything. Future property records survive but are neither selectable nor income-producing. A later ownership feature can move the unchanged economy into per-property state, retaining Sunny Acres under its stable ID; no new purchase, building-placement or passive-property economy exists yet.
+
+Additional checks:
+
+```
+node tests/model.cjs
+node tests/milestones.cjs
+```
+
+These cover legacy field preservation, migration idempotence, retained future metadata, bounded/monotonic progression, five mobile rendered milestone states and browser save migration. `tests/gameplay.cjs` compares original economy fields while independently checking property metadata survives prestige. Screenshots from the milestone suite are saved to the OS temporary directory.
