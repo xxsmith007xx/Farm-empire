@@ -35,6 +35,7 @@
   <div class="scene" id="scene">
     <canvas id="farm" width="800" height="530" aria-label="Animated chicken farm. Tap to hatch chickens and catch drones."></canvas>
     <button class="gift hide" id="gift" aria-label="Open gift">🎁</button>
+    <button class="mute" id="muteBtn" aria-label="Mute or unmute sound">🔊</button>
     <div class="hint" id="hint">👆 Tap the farm to hatch chickens · catch the drones!</div>
   </div>
 
@@ -146,10 +147,12 @@
       <div class="panel">
         <div class="section">Settings</div>
         <div class="row">
-          <button class="action alt" id="soundBtn">🔊 Sound on</button>
+          <button class="action alt" id="musicBtn">🎵 Music on</button>
+          <button class="action alt" id="soundBtn">🔊 Sounds on</button>
           <button class="action alt" id="exportSave">📋 Copy save code</button>
           <button class="action alt" id="importSave">📥 Import save</button>
         </div>
+        <div class="muted small" id="audioStatus" style="margin-top:10px"></div>
         <button class="action alt danger wide" id="resetBtn" style="margin-top:12px">Reset all progress</button>
       </div>
       <div class="footer">Farm Empire • Original idle farm game • Autosaves in this browser</div>
@@ -170,7 +173,12 @@
   <div class="card"><div class="mtitle" id="mTitle"></div><div class="mbody" id="mBody"></div><div class="row mbtns" id="mBtns"></div></div>
 </div>
 
+<script src="js/native.js"></script>
+<script src="vendor/pixi-legacy.min.js"></script>
 <script src="js/engine.js"></script>
+<script src="js/art.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/fx.js"></script>
 <script src="js/scene.js"></script>
 <script src="js/ui.js"></script>
 </body>

@@ -1,0 +1,23 @@
+{
+  "appId": "io.github.xxsmith007xx.farmempire",
+  "appName": "Farm Empire",
+  "webDir": "www",
+  "backgroundColor": "#174b43",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "launchAutoHide": true,
+      "launchFadeOutDuration": 300,
+      "backgroundColor": "#174b43",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#174b43",
+      "overlaysWebView": false
+    }
+  },
+  "ios": {
+    "contentInset": "never"
+  }
+}

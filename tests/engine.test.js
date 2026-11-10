@@ -108,6 +108,14 @@ test('load sanitises corrupt data and migrates the old prototype save', () => {
   assert.strictEqual(old.expansions, 2);
 });
 
+test('sound and music settings load separately and default to on', () => {
+  assert.deepStrictEqual(E.fresh().settings, { sound: true, music: true });
+  const s = E.load({ v: 3, settings: { sound: true, music: false } });
+  assert.strictEqual(s.settings.sound, true);
+  assert.strictEqual(s.settings.music, false);
+  assert.strictEqual(E.load({ v: 3, settings: { sound: false } }).settings.music, true);
+});
+
 test('achievements award gems once', () => {
   const s = E.fresh();
   s.stats.maxChickens = 150;
