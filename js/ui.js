@@ -156,6 +156,8 @@
     $('soundBtn').textContent = s.settings.sound ? '🔊 Sounds on' : '🔈 Sounds off';
     $('musicBtn').textContent = s.settings.music ? '🎵 Music on' : '🎵 Music off';
     $('musicBtn').classList.toggle('off', !s.settings.music); $('soundBtn').classList.toggle('off', !s.settings.sound);
+    const aus = AU.state;
+    $('audioStatus').textContent = 'Audio: ' + (aus === 'running' ? 'playing ✅' : aus === 'unsupported' ? 'not supported on this browser' : aus === 'none' ? 'starts when you tap' : 'waiting (' + aus + '), tap anywhere') + '. On iPhone, sound is muted while Silent mode is on.';
   }
 
   // ---------- Main refresh ----------

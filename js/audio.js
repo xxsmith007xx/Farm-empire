@@ -36,7 +36,7 @@
       ctx = new AC();
       const g = build(ctx); out = g.master; musicBus = g.mb; sfxBus = g.sb; verb = g.rv; noiseBuf = g.nb;
     }
-    if (ctx.state === 'suspended' && unlocked && !document.hidden) ctx.resume();
+    if (ctx.state !== 'running' && ctx.state !== 'closed' && unlocked && !document.hidden) ctx.resume().catch(() => {});
     return true;
   }
 
@@ -245,16 +245,23 @@
   }
 
   // ---------- lifecycle ----------
+  // Phones only let audio start inside a real tap (touchend/click), not on touch-down.
+  // We retry on every tap until the audio is running, which also recovers after a phone
+  // call or after the app was in the background.
   function unlock() {
-    if (unlocked) return;
+    if (ctx && ctx.state === 'running') return;
     unlocked = true;
     if (!ensure()) return;
-    ctx.resume().then(startMusic);
+    if (!ctx.onstatechange) ctx.onstatechange = () => { if (ctx.state === 'running') startMusic(); };
+    ctx.resume().catch(() => {});
+    // Safari needs a sound to be started during the tap before it opens the audio output.
+    try { const s = ctx.createBufferSource(); s.buffer = ctx.createBuffer(1, 1, 22050); s.connect(ctx.destination); s.start(0); } catch (e) { /* ignore */ }
+    startMusic();
   }
-  ['pointerdown', 'touchend', 'keydown'].forEach(ev => window.addEventListener(ev, unlock, { capture: true, passive: true }));
+  ['touchend', 'click', 'pointerup', 'keydown'].forEach(ev => window.addEventListener(ev, unlock, { capture: true, passive: true }));
   document.addEventListener('visibilitychange', () => {
     if (!ctx) return;
-    if (document.hidden) ctx.suspend(); else if (unlocked) ctx.resume();
+    if (document.hidden) ctx.suspend(); else if (unlocked) ctx.resume().catch(() => {});
   });
   function fadeBus(bus, on, vol) {
     if (!bus) return;
@@ -284,7 +291,7 @@
     setMusic(on) { musicOn = on; if (ctx) fadeBus(musicBus, on, MUSIC_VOL); if (on && unlocked) startMusic(); },
     setSfx(on) { sfxOn = on; if (ctx) fadeBus(sfxBus, on, SFX_VOL); },
     setSong(i) { const n = ((i % SONGS.length) + SONGS.length) % SONGS.length; if (n !== song) { song = n; step = 0; } },
-    get state() { return ctx ? ctx.state : 'none'; },
+    get state() { return !AC ? 'unsupported' : ctx ? ctx.state : 'none'; },
     SFX_NAMES: Object.keys(SFX),
     renderPreview
   };
